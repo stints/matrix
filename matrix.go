@@ -22,9 +22,9 @@ func New(rows int, cols int) *Mat {
 	}
 }
 
-func FromArray(data []float64, vector bool) *Mat {
+func FromArray(data []float64, columnVector bool) *Mat {
 	var mat *Mat
-	if vector {
+	if columnVector {
 		mat = New(len(data), 1)
 		mat.SetCol(1, data)
 	} else {
