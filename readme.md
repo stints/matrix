@@ -67,5 +67,5 @@ m1.Randomize(-1.0, 1.0)
 m2.Randomize(-1.0, 1.0)
 m3.Randomize(-1.0, 1.0)
 
-m4 = m2.Dot(m1).Add(m3).Map(Sigmoid) // [2x1]•[2x2] + [2x1] => [2x1]
+m4 = m2.Dot(m1).Add(m3).Map(Sigmoid) // Sigmoid([2x1]•[2x2] + [2x1]) => [2x1]
 ```
