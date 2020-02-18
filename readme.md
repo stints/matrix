@@ -56,3 +56,16 @@ m1.SetCol(1, c)  // length of data must match length of matrix column
 // Randomize values in matrix
 m1.Randomize(-10.0, 10.0)  // values will be between -10 and 10
 ```
+
+##### Method Chaining
+```Go
+m1 := New(2,1)
+m2 := New(2,2)
+m3 := New(2,1)
+
+m1.Randomize(-1.0, 1.0)
+m2.Randomize(-1.0, 1.0)
+m3.Randomize(-1.0, 1.0)
+
+m4 = m2.Dot(m1).Add(m3).Map(Sigmoid)
+```
