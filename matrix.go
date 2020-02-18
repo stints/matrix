@@ -22,6 +22,19 @@ func New(rows int, cols int) *Mat {
 	}
 }
 
+func FromArray(data []float64, vector bool) *Mat {
+	var mat *Mat
+	if vector {
+		mat = New(len(data), 1)
+		mat.SetCol(1, data)
+	} else {
+		mat = New(1, len(data))
+		mat.SetRow(1, data)
+	}
+
+	return mat
+}
+
 func (m *Mat) String() string {
 	var b bytes.Buffer
 	for i := 0; i < m.rows; i++ {
@@ -62,6 +75,14 @@ func (m *Mat) SetRow(row int, data []float64) {
 	}
 }
 
+func (m *Mat) SetCol(col int, data []float64) {
+	j := 0
+	for i := 1; i < m.rows+1; i++ {
+		m.data[m.index(i, col)] = data[j]
+		j++
+	}
+}
+
 func (m *Mat) Get(row int, col int) float64 {
 	return m.data[m.index(row, col)]
 }
@@ -86,31 +107,51 @@ func (m *Mat) GetCol(col int) []float64 {
 	return result
 }
 
-func (m *Mat) Add(m2 *Mat) {
+func (m *Mat) Add(m2 *Mat) *Mat {
 	if checkSize(m, m2, false) {
 		panic("Rows and columns must match.")
 	}
 	for i := 0; i < m.size(); i++ {
 		m.data[i] = m.data[i] + m2.data[i]
 	}
+	return m
 }
 
-func (m *Mat) Subtract(m2 *Mat) {
+func (m *Mat) Subtract(m2 *Mat) *Mat {
 	if checkSize(m, m2, false) {
 		panic("Rows and columns must match.")
 	}
 	for i := 0; i < m.size(); i++ {
 		m.data[i] = m.data[i] - m2.data[i]
 	}
+	return m
 }
 
-func (m *Mat) Scalar(scalar float64) {
+func (m *Mat) Scalar(scalar float64) *Mat {
 	for i := 0; i < m.size(); i++ {
 		m.data[i] = m.data[i] * scalar
 	}
+	return m
 }
 
 func (m *Mat) Multiply(m2 *Mat) *Mat {
+	if checkSize(m, m2, false) {
+		panic("Rows and columns must match.")
+	}
+	for i := 0; i < m.size(); i++ {
+		m.data[i] = m.data[i] * m2.data[i]
+	}
+	return m
+}
+
+func (m *Mat) Map(fn MappingFunc) *Mat {
+	for i := 0; i < m.size(); i++ {
+		m.data[i] = fn(m.data[i])
+	}
+	return m
+}
+
+func (m *Mat) Dot(m2 *Mat) *Mat {
 	if checkSize(m, m2, true) {
 		panic("The columns of the first matrix must match the rows of the second matrix.")
 	}
@@ -135,13 +176,21 @@ func (m *Mat) Transpose() *Mat {
 	return r
 }
 
-func (m *Mat) Map(fn MappingFunc) {
-	for i := 0; i < m.size(); i++ {
-		m.data[i] = fn(m.data[i])
-	}
-}
-
 // Static
+
+func Add(m1 *Mat, m2 *Mat) *Mat {
+	if checkSize(m1, m2, false) {
+		panic("Rows and columns must match.")
+	}
+
+	r := New(m1.rows, m1.cols)
+
+	for i := 0; i < r.size(); i++ {
+		r.data[i] = m1.data[i] + m2.data[i]
+	}
+
+	return r
+}
 
 func Subtract(m1 *Mat, m2 *Mat) *Mat {
 	if checkSize(m1, m2, false) {
@@ -157,7 +206,20 @@ func Subtract(m1 *Mat, m2 *Mat) *Mat {
 	return r
 }
 
-func Map(m1 *Mat, fn MappingFunc) *Mat{
+func Multiply(m1 *Mat, m2 *Mat) *Mat {
+	if checkSize(m1, m2, false) {
+		panic("Rows and columns must match.")
+	}
+
+	r := New(m1.rows, m1.cols)
+
+	for i := 0; i < r.size(); i++ {
+		r.data[i] = m1.data[i] * m2.data[i]
+	}
+	return r
+}
+
+func Map(m1 *Mat, fn MappingFunc) *Mat {
 	r := New(m1.rows, m1.cols)
 
 	for i := 0; i < r.size(); i++ {
