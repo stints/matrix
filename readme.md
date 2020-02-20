@@ -17,11 +17,11 @@ m1.Add(m2)  // or m4 := matrix.Add(m1, m2)
 // Subtract
 m1.Subtract(m2)  // or m4 := matrix.Subtract(m1, m2)
 
-// Multiply
-m1.Multiply(m2)  // or m4 := matrix.Multiply(m1, m2)
+// Hadamard - element wise multiplication
+m1.Hadamard(m2)  // or m4 := matrix.Multiply(m1, m2)
 
-// Dot Product
-m1.Dot(m2)
+// Multiply
+m1.Multiply(m2)
 
 // Scalar Multiplication
 m1.Scalar(3.0)
@@ -32,6 +32,10 @@ m4 := m1.Transpose()
 
 ##### Helper functions
 ```Go
+// Matrix size and shape
+size := m1.Size() // 12
+rows, cols := m1.Shape() // 3, 4
+
 // Map
 func Sigmoid(x float64) float64 {
 	return 1.0 / (1.0 + math.Exp(-1.0*x))
@@ -67,5 +71,5 @@ m1.Randomize(-1.0, 1.0)
 m2.Randomize(-1.0, 1.0)
 m3.Randomize(-1.0, 1.0)
 
-m4 = m2.Dot(m1).Add(m3).Map(Sigmoid) // Sigmoid([2x1]•[2x2] + [2x1]) => [2x1]
+m4 = m2.Multiply(m1).Add(m3).Map(Sigmoid)  // Sigmoid([2x1]•[2x2] + [2x1]) => [2x1]
 ```

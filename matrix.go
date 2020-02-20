@@ -46,8 +46,12 @@ func (m *Mat) String() string {
 	return b.String()
 }
 
-func (m *Mat) size() int {
+func (m *Mat) Size() int {
 	return m.rows * m.cols
+}
+
+func (m *Mat) Shape() (int, int) {
+	return m.rows, m.cols
 }
 
 func (m *Mat) index(row int, col int) int {
@@ -57,7 +61,7 @@ func (m *Mat) index(row int, col int) int {
 func (m *Mat) Randomize(min float64, max float64) {
 	rand.Seed(time.Now().UnixNano())
 	high := max - min
-	for i := 0; i < m.size(); i++ {
+	for i := 0; i < m.Size(); i++ {
 		m.data[i] = min + rand.Float64()*high
 	}
 }
@@ -108,51 +112,51 @@ func (m *Mat) GetCol(col int) []float64 {
 }
 
 func (m *Mat) Add(m2 *Mat) *Mat {
-	if checkSize(m, m2, false) {
+	if !checkSize(m, m2, false) {
 		panic("Rows and columns must match.")
 	}
-	for i := 0; i < m.size(); i++ {
+	for i := 0; i < m.Size(); i++ {
 		m.data[i] = m.data[i] + m2.data[i]
 	}
 	return m
 }
 
 func (m *Mat) Subtract(m2 *Mat) *Mat {
-	if checkSize(m, m2, false) {
+	if !checkSize(m, m2, false) {
 		panic("Rows and columns must match.")
 	}
-	for i := 0; i < m.size(); i++ {
+	for i := 0; i < m.Size(); i++ {
 		m.data[i] = m.data[i] - m2.data[i]
 	}
 	return m
 }
 
 func (m *Mat) Scalar(scalar float64) *Mat {
-	for i := 0; i < m.size(); i++ {
+	for i := 0; i < m.Size(); i++ {
 		m.data[i] = m.data[i] * scalar
 	}
 	return m
 }
 
-func (m *Mat) Multiply(m2 *Mat) *Mat {
-	if checkSize(m, m2, false) {
+func (m *Mat) Hadamard(m2 *Mat) *Mat {
+	if !checkSize(m, m2, false) {
 		panic("Rows and columns must match.")
 	}
-	for i := 0; i < m.size(); i++ {
+	for i := 0; i < m.Size(); i++ {
 		m.data[i] = m.data[i] * m2.data[i]
 	}
 	return m
 }
 
 func (m *Mat) Map(fn MappingFunc) *Mat {
-	for i := 0; i < m.size(); i++ {
+	for i := 0; i < m.Size(); i++ {
 		m.data[i] = fn(m.data[i])
 	}
 	return m
 }
 
-func (m *Mat) Dot(m2 *Mat) *Mat {
-	if checkSize(m, m2, true) {
+func (m *Mat) Multiply(m2 *Mat) *Mat {
+	if !checkSize(m, m2, true) {
 		panic("The columns of the first matrix must match the rows of the second matrix.")
 	}
 	r := New(m.rows, m2.cols)
@@ -179,13 +183,13 @@ func (m *Mat) Transpose() *Mat {
 // Static
 
 func Add(m1 *Mat, m2 *Mat) *Mat {
-	if checkSize(m1, m2, false) {
+	if !checkSize(m1, m2, false) {
 		panic("Rows and columns must match.")
 	}
 
 	r := New(m1.rows, m1.cols)
 
-	for i := 0; i < r.size(); i++ {
+	for i := 0; i < r.Size(); i++ {
 		r.data[i] = m1.data[i] + m2.data[i]
 	}
 
@@ -193,13 +197,13 @@ func Add(m1 *Mat, m2 *Mat) *Mat {
 }
 
 func Subtract(m1 *Mat, m2 *Mat) *Mat {
-	if checkSize(m1, m2, false) {
+	if !checkSize(m1, m2, false) {
 		panic("Rows and columns must match.")
 	}
 
 	r := New(m1.rows, m1.cols)
 
-	for i := 0; i < r.size(); i++ {
+	for i := 0; i < r.Size(); i++ {
 		r.data[i] = m1.data[i] - m2.data[i]
 	}
 
@@ -207,13 +211,13 @@ func Subtract(m1 *Mat, m2 *Mat) *Mat {
 }
 
 func Multiply(m1 *Mat, m2 *Mat) *Mat {
-	if checkSize(m1, m2, false) {
+	if !checkSize(m1, m2, false) {
 		panic("Rows and columns must match.")
 	}
 
 	r := New(m1.rows, m1.cols)
 
-	for i := 0; i < r.size(); i++ {
+	for i := 0; i < r.Size(); i++ {
 		r.data[i] = m1.data[i] * m2.data[i]
 	}
 	return r
@@ -222,7 +226,7 @@ func Multiply(m1 *Mat, m2 *Mat) *Mat {
 func Map(m1 *Mat, fn MappingFunc) *Mat {
 	r := New(m1.rows, m1.cols)
 
-	for i := 0; i < r.size(); i++ {
+	for i := 0; i < r.Size(); i++ {
 		r.data[i] = fn(m1.data[i])
 	}
 
