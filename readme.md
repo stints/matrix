@@ -1,5 +1,9 @@
 # Matrix
 
+A very simple matrix library to help me understand neural networks.
+
+Please use https://github.com/gonum/gonum for any actual matrix related programming needs.
+
 ##### Creating Matrices
 ```Go
 m1 := matrix.New(3, 4)  // 3x4
