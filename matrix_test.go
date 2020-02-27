@@ -65,7 +65,7 @@ func TestSubtract(t *testing.T) {
 func TestTranspose(t *testing.T) {
 	m1, _ := createMatrix()
 
-	m2 := m1.Transpose()
+	m2 := Transpose(m1)
 
 	if m2.Get(2, 1) != 2.0 {
 		t.Errorf("Error with transpose")

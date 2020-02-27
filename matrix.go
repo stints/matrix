@@ -15,6 +15,7 @@ type Mat struct {
 }
 
 func New(rows int, cols int) *Mat {
+	rand.Seed(time.Now().UnixNano())
 	return &Mat{
 		rows: rows,
 		cols: cols,
@@ -59,7 +60,6 @@ func (m *Mat) index(row int, col int) int {
 }
 
 func (m *Mat) Randomize(min float64, max float64) {
-	rand.Seed(time.Now().UnixNano())
 	high := max - min
 	for i := 0; i < m.Size(); i++ {
 		m.data[i] = min + rand.Float64()*high
@@ -159,25 +159,22 @@ func (m *Mat) Multiply(m2 *Mat) *Mat {
 	if !checkSize(m, m2, true) {
 		panic("The columns of the first matrix must match the rows of the second matrix.")
 	}
-	r := New(m.rows, m2.cols)
-	for i := 1; i <= r.rows; i++ {
-		for j := 1; j <= r.cols; j++ {
+	r := m.rows
+	c := m2.cols
+	data := make([]float64, r*c)
+
+	for i := 1; i <= r; i++ {
+		for j := 1; j <= c; j++ {
 			var value float64
 			for k := 1; k <= m.cols; k++ {
 				value += m.data[m.index(i, k)] * m2.data[m2.index(k, j)]
 			}
-			r.data[r.index(i, j)] = value
+			data[(i-1)*m2.cols+j-1] = value
 		}
 	}
-	return r
-}
-
-func (m *Mat) Transpose() *Mat {
-	r := New(m.cols, m.rows)
-	for i := 1; i <= m.cols; i++ {
-		r.SetRow(i, m.GetCol(i))
-	}
-	return r
+	m.cols = c
+	m.data = data
+	return m
 }
 
 // Static
@@ -210,7 +207,7 @@ func Subtract(m1 *Mat, m2 *Mat) *Mat {
 	return r
 }
 
-func Multiply(m1 *Mat, m2 *Mat) *Mat {
+func Hadamard(m1 *Mat, m2 *Mat) *Mat {
 	if !checkSize(m1, m2, false) {
 		panic("Rows and columns must match.")
 	}
@@ -223,6 +220,23 @@ func Multiply(m1 *Mat, m2 *Mat) *Mat {
 	return r
 }
 
+func Multiply(m1 *Mat, m2 *Mat) *Mat {
+	if !checkSize(m1, m2, true) {
+		panic("The columns of the first matrix must match the rows of the second matrix.")
+	}
+	r := New(m1.rows, m2.cols)
+	for i := 1; i <= r.rows; i++ {
+		for j := 1; j <= r.cols; j++ {
+			var value float64
+			for k := 1; k <= m1.cols; k++ {
+				value += m1.data[m1.index(i, k)] * m2.data[m2.index(k, j)]
+			}
+			r.data[r.index(i, j)] = value
+		}
+	}
+	return r
+}
+
 func Map(m1 *Mat, fn MappingFunc) *Mat {
 	r := New(m1.rows, m1.cols)
 
@@ -230,6 +244,14 @@ func Map(m1 *Mat, fn MappingFunc) *Mat {
 		r.data[i] = fn(m1.data[i])
 	}
 
+	return r
+}
+
+func Transpose(m1 *Mat) *Mat {
+	r := New(m1.cols, m1.rows)
+	for i := 1; i <= m1.cols; i++ {
+		r.SetRow(i, m1.GetCol(i))
+	}
 	return r
 }
 
